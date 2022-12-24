@@ -3,7 +3,9 @@ import Matrix
 
 # Please extend this interface for custom implementations and write your functions against this interface
 class Matrix:
-
+    '''
+    General interface for matrices allowing for row operations
+    '''
     def swap_rows(self, row1: int, row2: int):
         '''
         Swaps two rows in the matrix.
@@ -65,10 +67,10 @@ class Matrix:
         '''
         raise NotImplementedError
 
-    def get_pivot_column(self, row: int) -> int:
+    def get_pivot_column(self, row_num: int) -> int:
         '''
         Gets the pivot column of a specific row
-        :param row: the row index, starting at 0
+        :param row_num: the row index, starting at 0 or -1 if no pivot exists
         :return: the index of the pivot element, starting at 0
         '''
         raise NotImplementedError
@@ -90,7 +92,9 @@ class Matrix:
 
 
 class SimpleMatrix(Matrix):
-
+    '''
+    Simple implementation of Matrix based on lists.
+    '''
     def __init__(self, row_count: int, col_count: int):
         self.data: list[list[float]] = [ [0] * col_count for i in range(row_count)]
 
@@ -119,6 +123,13 @@ class SimpleMatrix(Matrix):
 
     def set_element(self, row:int, column:int, element:float) -> float:
         self.data[row][column] = element
+
+    def get_pivot_column(self, row_num:int)->int:
+        row=self.data[row_num]
+        for i in range(len(row)):
+            if row[i] != 0:
+                return i
+        return -1
 
     def copy(self) -> Matrix:
         copy = self.data.copy()
