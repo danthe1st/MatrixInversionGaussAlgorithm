@@ -1,6 +1,5 @@
-from Matrix import Matrix, SimpleMatrix
-from tkinter import *
-from tkinter import ttk
+from Matrix import SimpleMatrix
+from tkinter import Tk, ttk
 import time
 import threading
 
@@ -10,7 +9,7 @@ class VisualizationMatrix(SimpleMatrix):
     def __init__(self, root: Tk, row_count: int, col_count: int):
         super(VisualizationMatrix, self).__init__(row_count, col_count)
         self.root = root
-        self.labels: list[list[Label]] = []
+        self.labels: list[list[ttk.Label]] = []
         for i in range(row_count):
             row = []
             for j in range(col_count):
@@ -98,12 +97,14 @@ class Worker(threading.Thread):
         self.matrix=matrix
 
     def run(self):
+        # START calculation
         # TODO run calculation
         while True:
             self.matrix.swap_rows(0,1)
             self.matrix.set_element(0, 2, self.matrix.get_element(0, 0)+1)
             self.matrix.multiply_and_add(1,0,2)
             self.matrix.get_pivot_value(0)
+        # END calculation
         self.matrix.root.destroy()
 
 
