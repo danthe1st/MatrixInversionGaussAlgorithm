@@ -105,6 +105,7 @@ class Worker(threading.Thread):
             self.matrix.multiply_and_add(1,0,2)
             self.matrix.get_pivot_value(0)
         # END calculation
+        time.sleep(10)
         self.matrix.root.destroy()
 
 
