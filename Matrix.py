@@ -110,7 +110,7 @@ class SimpleMatrix(Matrix):
 
     def multiply_and_add(self, origin_row_num:int, target_row_num:int, scalar:float):
         for i in range(self.column_count()):
-            self.data[target_row_num][i] = self.data[origin_row_num][i] * scalar
+            self.data[target_row_num][i] = self.data[target_row_num][i] + self.data[origin_row_num][i] * scalar
 
     def column_count(self) -> int:
         return len(self.data[0])
