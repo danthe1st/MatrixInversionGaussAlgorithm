@@ -6,7 +6,7 @@ import threading
 
 class VisualizationMatrix(SimpleMatrix):
 
-    def __init__(self, root: Tk, row_count: int, col_count: int):
+    def __init__(self, root: Tk, row_count: int, col_count: int, sleep_time: int = 1):
         super(VisualizationMatrix, self).__init__(row_count, col_count)
         self.root = root
         self.labels: list[list[ttk.Label]] = []
@@ -17,15 +17,16 @@ class VisualizationMatrix(SimpleMatrix):
                 label.grid(row=i, column=j)
                 row.append(label)
             self.labels.append(row)
+        self.sleep_time=sleep_time
 
     def swap_rows(self, row1:int, row2:int):
         self.bold_row(row1)
         self.bold_row(row2)
         self.draw()
-        time.sleep(1)
+        time.sleep(self.sleep_time)
         SimpleMatrix.swap_rows(self, row1, row2)
         self.draw()
-        time.sleep(1)
+        time.sleep(self.sleep_time)
         self.reset_row(row1)
         self.reset_row(row2)
         self.draw()
@@ -33,10 +34,10 @@ class VisualizationMatrix(SimpleMatrix):
     def multiply_row(self, row_num:int, scalar:float):
         self.bold_row(row_num)
         self.draw()
-        time.sleep(1)
+        time.sleep(self.sleep_time)
         SimpleMatrix.multiply_row(self, row_num, scalar)
         self.draw()
-        time.sleep(1)
+        time.sleep(self.sleep_time)
         self.reset_row(row_num)
         self.draw()
 
@@ -44,10 +45,10 @@ class VisualizationMatrix(SimpleMatrix):
         self.bold_row(origin_row_num)
         self.bold_row(target_row_num)
         self.draw()
-        time.sleep(1)
+        time.sleep(self.sleep_time)
         SimpleMatrix.multiply_and_add(self, origin_row_num, target_row_num, scalar)
         self.draw()
-        time.sleep(1)
+        time.sleep(self.sleep_time)
         self.reset_row(origin_row_num)
         self.reset_row(target_row_num)
         self.draw()
@@ -59,11 +60,20 @@ class VisualizationMatrix(SimpleMatrix):
                 self.make_italic(self.labels[row_num][i])
             self.make_bold(self.labels[row_num][column])
             self.draw()
-            time.sleep(1)
+            time.sleep(self.sleep_time)
             self.reset_row(row_num)
 
         return column
 
+    def set_element(self, row:int, column:int, element:float)->float:
+        self.make_bold(self.labels[row][column])
+        self.draw()
+        SimpleMatrix.set_element(self, row, column, element)
+        time.sleep(self.sleep_time)
+        self.draw()
+        time.sleep(self.sleep_time)
+        self.reset_label(self.labels[row][column])
+        self.draw()
 
     def draw(self):
         for i in range(self.row_count()):
@@ -90,6 +100,12 @@ class VisualizationMatrix(SimpleMatrix):
         for label in row:
             self.reset_label(label)
 
+    def fill(self, data:list[list[float]]):
+        old_time=self.sleep_time
+        self.sleep_time=0
+        SimpleMatrix.fill(self, data)
+        self.sleep_time=old_time
+
 
 class Worker(threading.Thread):
     def __init__(self, matrix: VisualizationMatrix):
@@ -99,11 +115,12 @@ class Worker(threading.Thread):
     def run(self):
         # START calculation
         # TODO run calculation
-        while True:
-            self.matrix.swap_rows(0,1)
-            self.matrix.set_element(0, 2, self.matrix.get_element(0, 0)+1)
-            self.matrix.multiply_and_add(1,0,2)
-            self.matrix.get_pivot_value(0)
+        #e.g.
+        #from RowEchelon import to_row_echelon_form
+        #to_row_echelon_form(self.matrix)
+        self.matrix.get_pivot_value(1)
+        self.matrix.swap_rows(0, 1)
+        self.matrix.get_pivot_value(2)
         # END calculation
         time.sleep(10)
         self.matrix.root.destroy()
@@ -111,9 +128,15 @@ class Worker(threading.Thread):
 
 def main():
     root = Tk()
-    matrix = VisualizationMatrix(root, 5, 5)
-    matrix.set_element(0, 3, 1337)
-    matrix.swap_rows(1, 2)
+    #matrix = VisualizationMatrix(root, 5, 5)
+    #matrix.set_element(0, 3, 1337)
+    #matrix.swap_rows(1, 2)
+    matrix = VisualizationMatrix(root, 3, 4)
+    matrix.fill([
+        [1,2,-2, -15],
+        [2,1,-5, -21],
+        [1,-4,1, 18]
+        ])
     worker=Worker(matrix)
     worker.start()
     root.mainloop()

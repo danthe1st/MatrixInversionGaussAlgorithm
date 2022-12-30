@@ -90,6 +90,13 @@ class Matrix:
         '''
         raise NotImplementedError
 
+    def fill(self, data: list[list[float]]):
+        assert len(data)==self.row_count()
+        for i in range(self.row_count()):
+            assert len(data[i])==self.column_count()
+            for j in range(self.column_count()):
+                self.set_element(i, j, data[i][j])
+
 
 class SimpleMatrix(Matrix):
     '''
