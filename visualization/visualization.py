@@ -126,7 +126,7 @@ class Worker(threading.Thread):
         self.matrix.root.destroy()
 
 
-def main():
+def visualization_main():
     root = Tk()
     #matrix = VisualizationMatrix(root, 5, 5)
     #matrix.set_element(0, 3, 1337)
@@ -136,11 +136,11 @@ def main():
         [1,2,-2, -15],
         [2,1,-5, -21],
         [1,-4,1, 18]
-        ])
+    ])
     worker=Worker(matrix)
     worker.start()
     root.mainloop()
 
 
 if __name__ == '__main__':
-    main()
+    visualization_main()

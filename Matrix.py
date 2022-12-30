@@ -91,6 +91,10 @@ class Matrix:
         raise NotImplementedError
 
     def fill(self, data: list[list[float]]):
+        '''
+        replaces all elements of the matrix
+        :param data: the new elements as a list (rows) of lists (columns) containing the new elements
+        '''
         assert len(data)==self.row_count()
         for i in range(self.row_count()):
             assert len(data[i])==self.column_count()
