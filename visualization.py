@@ -148,12 +148,12 @@ class Worker(threading.Thread):
         # START calculation
         # TODO run calculation
         #e.g.
-        #from RowEchelon import to_row_echelon_form
-        #to_row_echelon_form(self.matrix)
-        self.matrix.get_pivot_value(1)
-        self.matrix.swap_rows(0, 1)
-        self.matrix.get_pivot_value(2)
-        self.matrix.multiply_and_add(1, 2, 0.5)
+        from ReducedRowEchelon import to_reduced_row_echelon_form
+        to_reduced_row_echelon_form(self.matrix)
+        #self.matrix.get_pivot_value(1)
+        #self.matrix.swap_rows(0, 1)
+        #self.matrix.get_pivot_value(2)
+        #self.matrix.multiply_and_add(1, 2, 0.5)
         # END calculation
         time.sleep(10)
         self.matrix.root.destroy()
