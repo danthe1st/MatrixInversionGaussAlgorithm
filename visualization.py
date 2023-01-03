@@ -161,6 +161,7 @@ class Worker(threading.Thread):
 
 def visualization_main():
     root = Tk()
+    root.title("Matrix inversion, Gauss algorithm")
     #matrix = VisualizationMatrix(root, 5, 5)
     #matrix.set_element(0, 3, 1337)
     #matrix.swap_rows(1, 2)
