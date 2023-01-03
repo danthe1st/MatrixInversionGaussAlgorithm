@@ -10,18 +10,22 @@ class VisualizationMatrix(SimpleMatrix):
         super(VisualizationMatrix, self).__init__(row_count, col_count)
         self.root = root
         self.labels: list[list[ttk.Label]] = []
+        self.detail_labels: list[ttk.Label] = []
         for i in range(col_count):
             root.columnconfigure(i, minsize=50)
+            label = ttk.Label(root, text="", font=("Helvetica"))
+            label.grid(row=row_count+2, column=i)
+            self.detail_labels.append(label)
         for i in range(row_count):
             row = []
             root.rowconfigure(i, weight=1)
             for j in range(col_count):
-                label = ttk.Label(root, text=self.get_element(i, j), font=("Helvetica", 18))
+                label = ttk.Label(root, text=SimpleMatrix.get_element(self, i, j), font=("Helvetica", 18))
                 label.grid(row=i, column=j)
                 row.append(label)
             self.labels.append(row)
         root.rowconfigure(row_count, weight=1)
-        self.info_label=ttk.Label(root, text="")
+        self.info_label=ttk.Label(root, text="", font=("Helvetica"))
         self.info_label.grid(row=row_count, columnspan=col_count)
         self.sleep_time=sleep_time
 
@@ -55,11 +59,15 @@ class VisualizationMatrix(SimpleMatrix):
         self.write_info(f"row {target_row_num} = row {target_row_num} + {float(scalar):.4} * row {origin_row_num}")
         self.italic_row(origin_row_num)
         self.bold_row(target_row_num)
+        for i in range(self.column_count()):
+            self.detail_labels[i].config(text=f"{float(SimpleMatrix.get_element(self, origin_row_num, i)*scalar):.3}")
         self.draw()
         time.sleep(3*self.sleep_time)
         SimpleMatrix.multiply_and_add(self, origin_row_num, target_row_num, scalar)
         self.draw()
         time.sleep(2*self.sleep_time)
+        for i in range(self.column_count()):
+            self.detail_labels[i].config(text="")
         self.reset_row(origin_row_num)
         self.reset_row(target_row_num)
         self.reset_info()
@@ -71,7 +79,7 @@ class VisualizationMatrix(SimpleMatrix):
             for i in range(column):
                 self.make_italic(self.labels[row_num][i])
             self.make_bold(self.labels[row_num][column])
-            self.write_info(f"Pivot of row {row_num} is {self.get_element(row_num, column)} (column {column})")
+            self.write_info(f"Pivot of row {row_num} is {SimpleMatrix.get_element(self,row_num, column)} (column {column})")
             self.draw()
             time.sleep(self.sleep_time)
             self.reset_row(row_num)
@@ -92,6 +100,15 @@ class VisualizationMatrix(SimpleMatrix):
             self.reset_info()
         self.draw()
 
+    def get_element(self, row:int, column:int)->float:
+        self.make_italic(self.labels[row][column])
+        self.write_info(f"read element at row {row}, column {column}")
+        ret = SimpleMatrix.get_element(self, row, column)
+        self.draw()
+        time.sleep(self.sleep_time/3)
+        self.reset_label(self.labels[row][column])
+        return ret
+
     def fill(self, data:list[list[float]]):
         self.write_info(f"reset/overwrite matrix")
         self.draw()
@@ -106,7 +123,7 @@ class VisualizationMatrix(SimpleMatrix):
     def draw(self):
         for i in range(self.row_count()):
             for j in range(self.column_count()):
-                self.labels[i][j].config(text=f"{float(self.get_element(i, j)):.3}")
+                self.labels[i][j].config(text=f"{float(SimpleMatrix.get_element(self, i, j)):.3}")
         self.root.update()
 
     def bold_row(self, row_num):
@@ -149,7 +166,7 @@ class Worker(threading.Thread):
         # TODO run calculation
         #e.g.
         from RowEchelon import to_row_echelon_form
-        to_row_echelon_form(self.matrix)
+        to_row_echelon_form(self.matrix, True)
         #self.matrix.get_pivot_value(1)
         #self.matrix.swap_rows(0, 1)
         #self.matrix.get_pivot_value(2)
