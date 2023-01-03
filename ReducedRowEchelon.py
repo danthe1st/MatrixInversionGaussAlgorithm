@@ -38,9 +38,6 @@ def to_reduced_row_echelon_form(matrix: SimpleMatrix):
         elem = matrix.get_element(row_index, column_index)
 
         # divide each element of the current row by the elem
-        #for rc in range(column_count):
-        #    matrix.set_element(row_index, rc, matrix.get_element(row_index, rc) / float(elem))
-
         matrix.multiply_row(row_index, 1/float(elem))
 
         # do this for all rows but the current one
@@ -51,9 +48,6 @@ def to_reduced_row_echelon_form(matrix: SimpleMatrix):
                 elem = matrix.get_element(i_row, column_index)
 
                 # subtract one column from another - the current one is skipped and used for the subtraction
-                #for ir in range(column_count):
-                #    value = matrix.get_element(i_row, ir) - elem * matrix.get_element(row_index, ir)
-                #    matrix.set_element(i_row, ir, value)
 
                 matrix.multiply_and_add(row_index, i_row, -elem)
 
