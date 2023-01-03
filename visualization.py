@@ -148,8 +148,8 @@ class Worker(threading.Thread):
         # START calculation
         # TODO run calculation
         #e.g.
-        from ReducedRowEchelon import to_reduced_row_echelon_form
-        to_reduced_row_echelon_form(self.matrix)
+        from RowEchelon import to_row_echelon_form
+        to_row_echelon_form(self.matrix)
         #self.matrix.get_pivot_value(1)
         #self.matrix.swap_rows(0, 1)
         #self.matrix.get_pivot_value(2)
@@ -164,11 +164,12 @@ def visualization_main():
     #matrix = VisualizationMatrix(root, 5, 5)
     #matrix.set_element(0, 3, 1337)
     #matrix.swap_rows(1, 2)
-    matrix = VisualizationMatrix(root, 3, 4)
+    matrix = VisualizationMatrix(root, 4,5)
     matrix.fill([
-        [1,2,-2, -15],
-        [2,1,-5, -21],
-        [1,-4,1, 18]
+        [4,1,2,-3,-16],
+        [-3,3,-1,4,20],
+        [-1,2,5,1,-4],
+        [5,4,3,-1,-10]
     ])
     worker=Worker(matrix)
     worker.start()

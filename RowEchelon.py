@@ -1,7 +1,7 @@
 from Matrix import SimpleMatrix
 
 
-def to_reduced_row_echelon_form(matrix: SimpleMatrix):
+def to_row_echelon_form(matrix: SimpleMatrix, reduced=False):
     # check if there even is a matrix
     if matrix is None:
         return
@@ -42,7 +42,7 @@ def to_reduced_row_echelon_form(matrix: SimpleMatrix):
 
         # do this for all rows but the current one
         for i_row in range(row_count):
-            if i_row != row_index:
+            if i_row > row_index or (reduced and i_row != row_index):
 
                 # get value
                 elem = matrix.get_element(i_row, column_index)
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     mx.fill(values)
 
-    to_reduced_row_echelon_form(mx)
+    to_row_echelon_form(mx)
 
     for i in range(mx.row_count()):
         print([int(value) for value in mx.data.__getitem__(i)])
