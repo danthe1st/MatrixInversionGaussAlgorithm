@@ -12,7 +12,7 @@ class VisualizationMatrix(SimpleMatrix):
         self.labels: list[list[ttk.Label]] = []
         self.detail_labels: list[ttk.Label] = []
         for i in range(col_count):
-            root.columnconfigure(i, minsize=50)
+            root.columnconfigure(i, minsize=75)
             label = ttk.Label(root, text="", font=("Helvetica"))
             label.grid(row=row_count+2, column=i)
             self.detail_labels.append(label)
