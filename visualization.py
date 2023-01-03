@@ -40,7 +40,7 @@ class VisualizationMatrix(SimpleMatrix):
         self.draw()
 
     def multiply_row(self, row_num:int, scalar:float):
-        self.write_info(f"multiply row {row_num} with {scalar}")
+        self.write_info(f"multiply row {row_num} with {float(scalar):.4}")
         self.bold_row(row_num)
         self.draw()
         time.sleep(self.sleep_time)
@@ -52,7 +52,7 @@ class VisualizationMatrix(SimpleMatrix):
         self.draw()
 
     def multiply_and_add(self, origin_row_num:int, target_row_num:int, scalar:float):
-        self.write_info(f"row {target_row_num}=row {target_row_num}+{scalar}*row {origin_row_num}")
+        self.write_info(f"row {target_row_num} = row {target_row_num} + {float(scalar):.4} * row {origin_row_num}")
         self.italic_row(origin_row_num)
         self.bold_row(target_row_num)
         self.draw()
@@ -81,7 +81,7 @@ class VisualizationMatrix(SimpleMatrix):
     def set_element(self, row:int, column:int, element:float)->float:
         if(self.sleep_time!=0):
             self.make_bold(self.labels[row][column])
-            self.write_info(f"Set element of row {row}/column {column} to {element}")
+            self.write_info(f"Set element of row {row}/column {column} to {float(element):.4}")
             self.draw()
         SimpleMatrix.set_element(self, row, column, element)
         if self.sleep_time!=0:
@@ -106,7 +106,7 @@ class VisualizationMatrix(SimpleMatrix):
     def draw(self):
         for i in range(self.row_count()):
             for j in range(self.column_count()):
-                self.labels[i][j].config(text=self.get_element(i, j))
+                self.labels[i][j].config(text=f"{float(self.get_element(i, j)):.3}")
         self.root.update()
 
     def bold_row(self, row_num):
