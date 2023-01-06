@@ -143,6 +143,8 @@ class SimpleMatrix(Matrix):
         return -1
 
     def copy(self) -> Matrix:
-        copy = self.data.copy()
-        for i in range(len(copy)):
-            copy[i] = copy[i].copy()
+        copy = SimpleMatrix(self.row_count(), self.column_count())
+        copy.data = self.data.copy()
+        for i in range(self.row_count()):
+            copy.data[i] = copy.data[i].copy()
+        return copy
