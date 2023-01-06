@@ -172,8 +172,6 @@ class Worker(threading.Thread):
         #self.matrix.get_pivot_value(2)
         #self.matrix.multiply_and_add(1, 2, 0.5)
         # END calculation
-        time.sleep(10)
-        self.matrix.root.destroy()
 
 
 def visualization_main():
