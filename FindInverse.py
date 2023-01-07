@@ -2,11 +2,13 @@ from Matrix import SimpleMatrix
 from RowEchelon import to_row_echelon_form
 
 
-def get_submatrix_r_c(matrix: SimpleMatrix, row: float, col: float) -> SimpleMatrix:
+def get_submatrix_r_c(matrix: SimpleMatrix, row: float,
+                      col: float) -> SimpleMatrix:
     """
     Submatrix of a matrix is obtained by deleting the rth row and cth column.
     """
-    submatrix_list = [r[:col] + r[col+1:] for r in matrix.data[:row] + matrix.data[row+1:]]
+    submatrix_list = [r[:col] + r[col + 1:] for r in
+                      matrix.data[:row] + matrix.data[row + 1:]]
     submatrix = SimpleMatrix(len(submatrix_list), len(submatrix_list))
     submatrix.fill(submatrix_list)
     return submatrix
@@ -18,17 +20,18 @@ def get_determinant(matrix: SimpleMatrix) -> float:
     to find the determinant of the matrix.
     Matrix minor - is the determinant of the submatrix.
     """
-    dim = matrix.row_count() # dimensions
+    dim = matrix.row_count()  # dimensions
     if dim == 1:
         return matrix.get_element(0, 0)
-    det = 0 # the determinant of the matrix
+    det = 0  # the determinant of the matrix
     for j in range(dim):
         minor = get_determinant(get_submatrix_r_c(matrix, 0, j))
         det += ((-1) ** (0 + j)) * matrix.get_element(0, j) * minor
     return det
 
 
-def get_augmented(matrix_a: SimpleMatrix, matrix_b: SimpleMatrix) -> SimpleMatrix:
+def get_augmented(matrix_a: SimpleMatrix,
+                  matrix_b: SimpleMatrix) -> SimpleMatrix:
     """
     Returns an augmented matrix - matrix_a | matrix_b
     """
@@ -44,7 +47,6 @@ def get_augmented(matrix_a: SimpleMatrix, matrix_b: SimpleMatrix) -> SimpleMatri
     return augmented
 
 
-
 def get_identity_matrix(dim: int) -> SimpleMatrix:
     """
     Computes the identity matrix of dimensions dim x dim
@@ -53,6 +55,7 @@ def get_identity_matrix(dim: int) -> SimpleMatrix:
     for row in range(dim):
         identity.set_element(row, row, 1)
     return identity
+
 
 def get_inverse(matrix: SimpleMatrix) -> SimpleMatrix:
     """
@@ -74,12 +77,11 @@ def get_inverse(matrix: SimpleMatrix) -> SimpleMatrix:
     augmented_matrix = get_augmented(matrix, identity_matrix)
     # Compute the RREF of the augmented matrix
     to_row_echelon_form(augmented_matrix, True)
-    # Extract the right hand side of the matrix that was previosly an identity
+    # Extract the right hand side of the matrix that was previously an identity
     temp_data = augmented_matrix.data
     temp_data = [row[dim:] for row in temp_data]
     inverse.fill(temp_data)
     return inverse
-
 
 
 if __name__ == '__main__':
@@ -89,5 +91,5 @@ if __name__ == '__main__':
     mtrx.fill(vals)
     inverse_matrix = get_inverse(mtrx)
 
-    for row in inverse_matrix.data:
-        print(row)
+    for line in inverse_matrix.data:
+        print(line)
