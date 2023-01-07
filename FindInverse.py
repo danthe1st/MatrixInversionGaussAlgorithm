@@ -1,4 +1,4 @@
-from Matrix import SimpleMatrix
+from Matrix import Matrix, SimpleMatrix
 from RowEchelon import to_row_echelon_form
 
 
@@ -57,31 +57,43 @@ def get_identity_matrix(dim: int) -> SimpleMatrix:
     return identity
 
 
-def get_inverse(matrix: SimpleMatrix) -> SimpleMatrix:
+def find_augmented_matrix(matrix: SimpleMatrix) -> SimpleMatrix:
     """
-    Firstly check whether the matrix is square, and then check that it
-    is non-singular.
+    Finds the augmented matrix consisting of the matrix and the corresponding identity matrix if it is inversible.
+    It is inversible if it is square and non-singular.
     A matrix is non-singular if and only if its determinant is non-zero.
-    Afterwards, if the matrix is non-singular, compute the inverse of matrix by
-    computing the ref of an augmented matrix M | I.
-    Find the inverse of the matrix by computing the RREF of the
+    Returns None if the matrix is not inversible
     """
-
-    if not matrix.row_count() == matrix.column_count():
+    if matrix.row_count() != matrix.column_count():
         return None
     if get_determinant(matrix) == 0:
         return None
-    dim = matrix.row_count()
-    inverse = SimpleMatrix(dim, dim)
-    identity_matrix = get_identity_matrix(dim)
-    augmented_matrix = get_augmented(matrix, identity_matrix)
+    identity_matrix = get_identity_matrix(matrix.row_count())
+    return get_augmented(matrix, identity_matrix)
+
+
+def get_inverse_from_augmented_matrix(augmented_matrix: Matrix):
+    if augmented_matrix is None:
+        return None
+    dim = augmented_matrix.row_count()
     # Compute the RREF of the augmented matrix
     to_row_echelon_form(augmented_matrix, True)
     # Extract the right hand side of the matrix that was previously an identity
-    temp_data = augmented_matrix.data
-    temp_data = [row[dim:] for row in temp_data]
-    inverse.fill(temp_data)
+    inverse = SimpleMatrix(dim, dim)
+    for i in range(dim):
+        for j in range(dim):
+            inverse.set_element(i, j, augmented_matrix.get_element(i, j+dim))
+
     return inverse
+
+def get_inverse(matrix: SimpleMatrix) -> SimpleMatrix:
+    """
+    Afterwards, if the matrix is non-singular, compute the inverse of matrix by
+    computing the ref of an augmented matrix M | I.
+    Find the inverse of the matrix by computing the RREF of the augmented matrix
+    """
+    augmented_matrix = find_augmented_matrix(matrix)
+    return get_inverse_from_augmented_matrix(augmented_matrix)
 
 
 if __name__ == '__main__':

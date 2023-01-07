@@ -169,16 +169,15 @@ class VisualizationMatrix(Matrix):
 
 
 class Worker(threading.Thread):
-    def __init__(self, matrix: VisualizationMatrix):
+    def __init__(self, fn):
         threading.Thread.__init__(self)
-        self.matrix=matrix
+        self.fn=fn
 
     def run(self):
         # START calculation
         # TODO run calculation
         #e.g.
-        from RowEchelon import to_row_echelon_form
-        to_row_echelon_form(self.matrix, True)
+        self.fn()
         #self.matrix.get_pivot_value(1)
         #self.matrix.swap_rows(0, 1)
         #self.matrix.get_pivot_value(2)
@@ -186,21 +185,34 @@ class Worker(threading.Thread):
         # END calculation
 
 
+
+def prepare_inverse(root):
+    matrix = SimpleMatrix(4, 4)
+    matrix.fill([[1, 1, 1, -1], [1, 1, -1, 1], [1, -1, 1, 1], [-1, 1, 1, 1]])
+    from FindInverse import find_augmented_matrix, get_inverse_from_augmented_matrix
+    augmented = find_augmented_matrix(matrix)
+    vis_matrix = VisualizationMatrix(root, augmented)
+    return Worker(lambda: get_inverse_from_augmented_matrix(vis_matrix))
+
+
+def prepare_row_echelon(root):
+    matrix = VisualizationMatrix(root, SimpleMatrix(5, 5))
+    matrix.fill([[4, 1, 2, -3, -16],
+            [-3, 3, -1, 4, 20],
+            [-1, 2, 5, 1, -4],
+            [0, 0, 0, 0, 0],
+            [5, 4, 3, -1, -10]])
+    from RowEchelon import to_row_echelon_form
+    return Worker(lambda: to_row_echelon_form(matrix, True))
+
 def visualization_main():
     root = Tk()
     root.title("Matrix inversion, Gauss algorithm")
     #matrix = VisualizationMatrix(root, 5, 5)
     #matrix.set_element(0, 3, 1337)
     #matrix.swap_rows(1, 2)
-    matrix = VisualizationMatrix(root, SimpleMatrix(5,5))
-    matrix.fill([
-        [4,1,2,-3,-16],
-        [-3,3,-1,4,20],
-        [-1,2,5,1,-4],
-        [0,0,0,0,0],
-        [5,4,3,-1,-10]
-    ])
-    worker=Worker(matrix)
+    #worker = prepare_row_echelon(root)
+    worker = prepare_inverse(root)
     worker.start()
     root.mainloop()
 
