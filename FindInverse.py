@@ -59,10 +59,10 @@ def get_identity_matrix(dim: int) -> SimpleMatrix:
 
 def find_augmented_matrix(matrix: SimpleMatrix) -> SimpleMatrix:
     """
-    Finds the augmented matrix consisting of the matrix and the corresponding identity matrix if it is inversible.
-    It is inversible if it is square and non-singular.
+    Finds the augmented matrix consisting of the matrix and the corresponding identity matrix if it is invertable.
+    It is invertable if it is square and non-singular.
     A matrix is non-singular if and only if its determinant is non-zero.
-    Returns None if the matrix is not inversible
+    Returns None if the matrix is not invertable
     """
     if matrix.row_count() != matrix.column_count():
         return None
