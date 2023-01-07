@@ -1,20 +1,20 @@
 from Matrix import Matrix, SimpleMatrix
+import visualization_config as config
 from tkinter import Tk, ttk
-import time
 import threading
 
 
 class VisualizationMatrix(Matrix):
 
-    def __init__(self, root: Tk, actual: Matrix, sleep_time: int = 2):
+    def __init__(self, root: Tk, actual: Matrix, sleep_time: int=2):
         self.root = root
-        self.actual=actual
+        self.actual = actual
         self.element_labels: list[list[ttk.Label]] = []
         self.detail_labels: list[ttk.Label] = []
         for i in range(actual.column_count()):
             root.columnconfigure(i, minsize=75)
             label = ttk.Label(root, text="", font=("Helvetica"))
-            label.grid(row=actual.row_count()+2, column=i)
+            label.grid(row=actual.row_count() + 2, column=i)
             self.detail_labels.append(label)
         for i in range(actual.row_count()):
             row = []
@@ -29,14 +29,14 @@ class VisualizationMatrix(Matrix):
         ttk.Button(text="Auto", command=self.play_btn).grid(row=0, column=self.column_count())
         ttk.Button(text="Next", command=self.next_btn).grid(row=1, column=self.column_count())
 
-        self.info_label=ttk.Label(root, text="", font=("Helvetica"))
+        self.info_label = ttk.Label(root, text="", font=("Helvetica"))
         self.info_label.grid(row=actual.row_count(), columnspan=actual.column_count())
-        self.sleep_time=sleep_time
-        self.sleep_condition=threading.Condition()
-        self.autorun=False
+        self.sleep_time = sleep_time
+        self.sleep_condition = threading.Condition()
+        self.autorun = False
 
     def play_btn(self):
-        self.autorun=not self.autorun
+        self.autorun = not self.autorun
         if self.autorun:
             self.next_btn()
 
@@ -89,9 +89,9 @@ class VisualizationMatrix(Matrix):
         self.reset_info()
         self.draw()
 
-    def get_pivot_column(self, row_num:int)->int:
+    def get_pivot_column(self, row_num:int) -> int:
         column = self.actual.get_pivot_column(row_num)
-        if column!=-1:
+        if column != -1:
             for i in range(column):
                 self.make_italic(self.element_labels[row_num][i])
             self.make_bold(self.element_labels[row_num][column])
@@ -103,13 +103,13 @@ class VisualizationMatrix(Matrix):
             self.draw()
         return column
 
-    def set_element(self, row:int, column:int, element:float)->float:
-        if(self.sleep_time!=0):
+    def set_element(self, row:int, column:int, element:float) -> float:
+        if(self.sleep_time != 0):
             self.make_bold(self.element_labels[row][column])
             self.write_info(f"Set element of row {row}/column {column} to {float(element):.4}")
             self.draw()
         self.actual.set_element(row, column, element)
-        if self.sleep_time!=0:
+        if self.sleep_time != 0:
             self.wait()
             self.draw()
             self.wait()
@@ -117,12 +117,12 @@ class VisualizationMatrix(Matrix):
             self.reset_info()
         self.draw()
 
-    def get_element(self, row:int, column:int)->float:
+    def get_element(self, row:int, column:int) -> float:
         self.make_italic(self.element_labels[row][column])
         self.write_info(f"read element at row {row}, column {column}")
         ret = self.actual.get_element(row, column)
         self.draw()
-        self.wait(1/3)
+        self.wait(1 / 3)
         self.reset_label(self.element_labels[row][column])
         self.reset_info()
         self.draw()
@@ -132,20 +132,20 @@ class VisualizationMatrix(Matrix):
         self.write_info(f"reset/overwrite matrix")
         self.draw()
         self.wait()
-        old_time=self.sleep_time
-        self.sleep_time=0
+        old_time = self.sleep_time
+        self.sleep_time = 0
         self.actual.fill(data)
         self.reset_info()
-        self.sleep_time=old_time
+        self.sleep_time = old_time
         self.wait()
 
-    def copy(self)->Matrix:
+    def copy(self) -> Matrix:
         return VisualizationMatrix(self.root, self.actual.copy(), self.sleep_time)
 
-    def row_count(self)->int:
+    def row_count(self) -> int:
         return self.actual.row_count()
 
-    def column_count(self)->int:
+    def column_count(self) -> int:
         return self.actual.column_count()
 
     def draw(self):
@@ -155,11 +155,12 @@ class VisualizationMatrix(Matrix):
         self.root.update()
 
     def bold_row(self, row_num):
-        row=self.element_labels[row_num]
+        row = self.element_labels[row_num]
         for label in row:
             self.make_bold(label)
+
     def italic_row(self, row_num):
-        row=self.element_labels[row_num]
+        row = self.element_labels[row_num]
         for label in row:
             self.make_italic(label)
 
@@ -173,7 +174,7 @@ class VisualizationMatrix(Matrix):
         label.config(font=("Helvetica", 18))
 
     def reset_row(self, row_num):
-        row=self.element_labels[row_num]
+        row = self.element_labels[row_num]
         for label in row:
             self.reset_label(label)
 
@@ -186,30 +187,27 @@ class VisualizationMatrix(Matrix):
     def wait(self, factor:float=1):
         self.sleep_condition.acquire()
         if self.autorun:
-            self.sleep_condition.wait(factor*self.sleep_time)
+            self.sleep_condition.wait(factor * self.sleep_time)
         else:
             self.sleep_condition.wait()
         self.sleep_condition.release()
 
 
 class Worker(threading.Thread):
+
     def __init__(self, fn):
         threading.Thread.__init__(self)
-        self.fn=fn
+        self.fn = fn
 
     def run(self):
         self.fn()
 
 
-
 def prepare_inverse(root):
-    #matrix = SimpleMatrix(4, 4)
-    #matrix.fill([[1, 1, 1, -1], [1, 1, -1, 1], [1, -1, 1, 1], [-1, 1, 1, 1]])
+    # matrix = SimpleMatrix(4, 4)
+    # matrix.fill([[1, 1, 1, -1], [1, 1, -1, 1], [1, -1, 1, 1], [-1, 1, 1, 1]])
     matrix = SimpleMatrix(4, 4)
-    matrix.fill([[4, 1, 2, -3],
-            [-3, 3, -1, 4],
-            [-1, 2, 5, 1],
-            [5, 4, 3, -1]])
+    matrix.fill(config.inverse_matrix)
     from FindInverse import find_augmented_matrix, get_inverse_from_augmented_matrix
     augmented = find_augmented_matrix(matrix)
     if augmented is None:
@@ -217,27 +215,28 @@ def prepare_inverse(root):
         return Worker(lambda: None)
     vis_matrix = VisualizationMatrix(root, augmented)
     for i in range(vis_matrix.row_count()):
-        vis_matrix.element_labels[i][vis_matrix.row_count()].grid(padx=(50,0))
+        vis_matrix.element_labels[i][vis_matrix.row_count()].grid(padx=(50, 0))
     return Worker(lambda: print(get_inverse_from_augmented_matrix(vis_matrix)))
 
 
 def prepare_row_echelon(root):
-    matrix = VisualizationMatrix(root, SimpleMatrix(4, 5))
-    matrix.fill([[4, 1, 2, -3, -16],
-            [-3, 3, -1, 4, 20],
-            [-1, 2, 5, 1, -4],
-            [5, 4, 3, -1, -10]])
+    original = SimpleMatrix(4, 5)
+    matrix = VisualizationMatrix(root, original)
+    original.fill(config.ref_matrix)
     from RowEchelon import to_row_echelon_form
-    return Worker(lambda: to_row_echelon_form(matrix, True))
+    return Worker(lambda: to_row_echelon_form(matrix, config.operation==config.VisualizationType.RREF))
+
 
 def visualization_main():
     root = Tk()
     root.title("Matrix inversion, Gauss algorithm")
-    #matrix = VisualizationMatrix(root, 5, 5)
-    #matrix.set_element(0, 3, 1337)
-    #matrix.swap_rows(1, 2)
-    #worker = prepare_row_echelon(root)
-    worker = prepare_inverse(root)
+    # matrix = VisualizationMatrix(root, 5, 5)
+    # matrix.set_element(0, 3, 1337)
+    # matrix.swap_rows(1, 2)
+    if config.operation.value<2:
+        worker = prepare_row_echelon(root)
+    else:
+        worker = prepare_inverse(root)
     worker.start()
     root.mainloop()
 
