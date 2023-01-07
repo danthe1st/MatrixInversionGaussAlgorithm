@@ -101,6 +101,14 @@ class Matrix:
             for j in range(self.column_count()):
                 self.set_element(i, j, data[i][j])
 
+    def __repr__(self) -> str:
+        ret=""
+        for row in range(self.row_count()):
+            for col in range(self.column_count()):
+                ret += f"{self.get_element(row, col):20}"
+                ret += " "
+            ret += "\n"
+        return ret
 
 class SimpleMatrix(Matrix):
     '''

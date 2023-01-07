@@ -9,7 +9,7 @@ class VisualizationMatrix(Matrix):
     def __init__(self, root: Tk, actual: Matrix, sleep_time: int = 2):
         self.root = root
         self.actual=actual
-        self.labels: list[list[ttk.Label]] = []
+        self.element_labels: list[list[ttk.Label]] = []
         self.detail_labels: list[ttk.Label] = []
         for i in range(actual.column_count()):
             root.columnconfigure(i, minsize=75)
@@ -23,7 +23,7 @@ class VisualizationMatrix(Matrix):
                 label = ttk.Label(root, text=self.actual.get_element(i, j), font=("Helvetica", 18))
                 label.grid(row=i, column=j)
                 row.append(label)
-            self.labels.append(row)
+            self.element_labels.append(row)
         root.rowconfigure(actual.row_count(), weight=1)
         self.info_label=ttk.Label(root, text="", font=("Helvetica"))
         self.info_label.grid(row=actual.row_count(), columnspan=actual.column_count())
@@ -77,8 +77,8 @@ class VisualizationMatrix(Matrix):
         column = self.actual.get_pivot_column(row_num)
         if column!=-1:
             for i in range(column):
-                self.make_italic(self.labels[row_num][i])
-            self.make_bold(self.labels[row_num][column])
+                self.make_italic(self.element_labels[row_num][i])
+            self.make_bold(self.element_labels[row_num][column])
             self.write_info(f"Pivot of row {row_num} is {self.actual.get_element(row_num, column)} (column {column})")
             self.draw()
             time.sleep(self.sleep_time)
@@ -89,7 +89,7 @@ class VisualizationMatrix(Matrix):
 
     def set_element(self, row:int, column:int, element:float)->float:
         if(self.sleep_time!=0):
-            self.make_bold(self.labels[row][column])
+            self.make_bold(self.element_labels[row][column])
             self.write_info(f"Set element of row {row}/column {column} to {float(element):.4}")
             self.draw()
         self.actual.set_element(row, column, element)
@@ -97,17 +97,17 @@ class VisualizationMatrix(Matrix):
             time.sleep(self.sleep_time)
             self.draw()
             time.sleep(self.sleep_time)
-            self.reset_label(self.labels[row][column])
+            self.reset_label(self.element_labels[row][column])
             self.reset_info()
         self.draw()
 
     def get_element(self, row:int, column:int)->float:
-        self.make_italic(self.labels[row][column])
+        self.make_italic(self.element_labels[row][column])
         self.write_info(f"read element at row {row}, column {column}")
         ret = self.actual.get_element(row, column)
         self.draw()
         time.sleep(self.sleep_time/3)
-        self.reset_label(self.labels[row][column])
+        self.reset_label(self.element_labels[row][column])
         self.reset_info()
         self.draw()
         return ret
@@ -135,15 +135,15 @@ class VisualizationMatrix(Matrix):
     def draw(self):
         for i in range(self.row_count()):
             for j in range(self.column_count()):
-                self.labels[i][j].config(text=f"{float(self.actual.get_element(i, j)):.3}")
+                self.element_labels[i][j].config(text=f"{float(self.actual.get_element(i, j)):.3}")
         self.root.update()
 
     def bold_row(self, row_num):
-        row=self.labels[row_num]
+        row=self.element_labels[row_num]
         for label in row:
             self.make_bold(label)
     def italic_row(self, row_num):
-        row=self.labels[row_num]
+        row=self.element_labels[row_num]
         for label in row:
             self.make_italic(label)
 
@@ -157,7 +157,7 @@ class VisualizationMatrix(Matrix):
         label.config(font=("Helvetica", 18))
 
     def reset_row(self, row_num):
-        row=self.labels[row_num]
+        row=self.element_labels[row_num]
         for label in row:
             self.reset_label(label)
 
@@ -179,8 +179,8 @@ class Worker(threading.Thread):
 
 
 def prepare_inverse(root):
-    matrix = SimpleMatrix(4, 4)
-    matrix.fill([[1, 1, 1, -1], [1, 1, -1, 1], [1, -1, 1, 1], [-1, 1, 1, 1]])
+    #matrix = SimpleMatrix(4, 4)
+    #matrix.fill([[1, 1, 1, -1], [1, 1, -1, 1], [1, -1, 1, 1], [-1, 1, 1, 1]])
     matrix = SimpleMatrix(4, 4)
     matrix.fill([[4, 1, 2, -3],
             [-3, 3, -1, 4],
@@ -188,8 +188,14 @@ def prepare_inverse(root):
             [5, 4, 3, -1]])
     from FindInverse import find_augmented_matrix, get_inverse_from_augmented_matrix
     augmented = find_augmented_matrix(matrix)
+    if augmented is None:
+        ttk.Label(root, text="Matrix is not invertible").grid(row=0, column=0)
+        return Worker(lambda: None)
     vis_matrix = VisualizationMatrix(root, augmented)
-    return Worker(lambda: get_inverse_from_augmented_matrix(vis_matrix))
+    for i in range(vis_matrix.row_count()):
+        vis_matrix.element_labels[i][vis_matrix.row_count()].grid(padx=(50,0))
+    vis_matrix.sleep_time=0
+    return Worker(lambda: print(get_inverse_from_augmented_matrix(vis_matrix)))
 
 
 def prepare_row_echelon(root):
