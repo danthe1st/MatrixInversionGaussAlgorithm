@@ -174,21 +174,18 @@ class Worker(threading.Thread):
         self.fn=fn
 
     def run(self):
-        # START calculation
-        # TODO run calculation
-        #e.g.
         self.fn()
-        #self.matrix.get_pivot_value(1)
-        #self.matrix.swap_rows(0, 1)
-        #self.matrix.get_pivot_value(2)
-        #self.matrix.multiply_and_add(1, 2, 0.5)
-        # END calculation
 
 
 
 def prepare_inverse(root):
     matrix = SimpleMatrix(4, 4)
     matrix.fill([[1, 1, 1, -1], [1, 1, -1, 1], [1, -1, 1, 1], [-1, 1, 1, 1]])
+    matrix = SimpleMatrix(4, 4)
+    matrix.fill([[4, 1, 2, -3],
+            [-3, 3, -1, 4],
+            [-1, 2, 5, 1],
+            [5, 4, 3, -1]])
     from FindInverse import find_augmented_matrix, get_inverse_from_augmented_matrix
     augmented = find_augmented_matrix(matrix)
     vis_matrix = VisualizationMatrix(root, augmented)
@@ -196,11 +193,10 @@ def prepare_inverse(root):
 
 
 def prepare_row_echelon(root):
-    matrix = VisualizationMatrix(root, SimpleMatrix(5, 5))
+    matrix = VisualizationMatrix(root, SimpleMatrix(4, 5))
     matrix.fill([[4, 1, 2, -3, -16],
             [-3, 3, -1, 4, 20],
             [-1, 2, 5, 1, -4],
-            [0, 0, 0, 0, 0],
             [5, 4, 3, -1, -10]])
     from RowEchelon import to_row_echelon_form
     return Worker(lambda: to_row_echelon_form(matrix, True))
