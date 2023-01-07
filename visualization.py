@@ -25,19 +25,35 @@ class VisualizationMatrix(Matrix):
                 row.append(label)
             self.element_labels.append(row)
         root.rowconfigure(actual.row_count(), weight=1)
+
+        ttk.Button(text="Auto", command=self.play_btn).grid(row=0, column=self.column_count())
+        ttk.Button(text="Next", command=self.next_btn).grid(row=1, column=self.column_count())
+
         self.info_label=ttk.Label(root, text="", font=("Helvetica"))
         self.info_label.grid(row=actual.row_count(), columnspan=actual.column_count())
         self.sleep_time=sleep_time
+        self.sleep_condition=threading.Condition()
+        self.autorun=False
+
+    def play_btn(self):
+        self.autorun=not self.autorun
+        if self.autorun:
+            self.next_btn()
+
+    def next_btn(self):
+        self.sleep_condition.acquire()
+        self.sleep_condition.notify()
+        self.sleep_condition.release()
 
     def swap_rows(self, row1:int, row2:int):
         self.write_info(f"Swap rows {row1} and {row2}")
         self.bold_row(row1)
         self.bold_row(row2)
         self.draw()
-        time.sleep(self.sleep_time)
+        self.wait()
         self.actual.swap_rows(row1, row2)
         self.draw()
-        time.sleep(self.sleep_time)
+        self.wait()
         self.reset_info()
         self.reset_row(row1)
         self.reset_row(row2)
@@ -47,10 +63,10 @@ class VisualizationMatrix(Matrix):
         self.write_info(f"multiply row {row_num} with {float(scalar):.4}")
         self.bold_row(row_num)
         self.draw()
-        time.sleep(self.sleep_time)
+        self.wait()
         self.actual.multiply_row(row_num, scalar)
         self.draw()
-        time.sleep(self.sleep_time)
+        self.wait()
         self.reset_info()
         self.reset_row(row_num)
         self.draw()
@@ -62,10 +78,10 @@ class VisualizationMatrix(Matrix):
         for i in range(self.column_count()):
             self.detail_labels[i].config(text=f"{float(self.actual.get_element(origin_row_num, i)*scalar):.3}")
         self.draw()
-        time.sleep(3*self.sleep_time)
+        self.wait(3)
         self.actual.multiply_and_add(origin_row_num, target_row_num, scalar)
         self.draw()
-        time.sleep(2*self.sleep_time)
+        self.wait(2)
         for i in range(self.column_count()):
             self.detail_labels[i].config(text="")
         self.reset_row(origin_row_num)
@@ -81,7 +97,7 @@ class VisualizationMatrix(Matrix):
             self.make_bold(self.element_labels[row_num][column])
             self.write_info(f"Pivot of row {row_num} is {self.actual.get_element(row_num, column)} (column {column})")
             self.draw()
-            time.sleep(self.sleep_time)
+            self.wait()
             self.reset_row(row_num)
             self.reset_info()
             self.draw()
@@ -94,9 +110,9 @@ class VisualizationMatrix(Matrix):
             self.draw()
         self.actual.set_element(row, column, element)
         if self.sleep_time!=0:
-            time.sleep(self.sleep_time)
+            self.wait()
             self.draw()
-            time.sleep(self.sleep_time)
+            self.wait()
             self.reset_label(self.element_labels[row][column])
             self.reset_info()
         self.draw()
@@ -106,7 +122,7 @@ class VisualizationMatrix(Matrix):
         self.write_info(f"read element at row {row}, column {column}")
         ret = self.actual.get_element(row, column)
         self.draw()
-        time.sleep(self.sleep_time/3)
+        self.wait(1/3)
         self.reset_label(self.element_labels[row][column])
         self.reset_info()
         self.draw()
@@ -115,13 +131,13 @@ class VisualizationMatrix(Matrix):
     def fill(self, data:list[list[float]]):
         self.write_info(f"reset/overwrite matrix")
         self.draw()
-        time.sleep(self.sleep_time)
+        self.wait()
         old_time=self.sleep_time
         self.sleep_time=0
         self.actual.fill(data)
         self.reset_info()
         self.sleep_time=old_time
-        time.sleep(self.sleep_time)
+        self.wait()
 
     def copy(self)->Matrix:
         return VisualizationMatrix(self.root, self.actual.copy(), self.sleep_time)
@@ -167,6 +183,14 @@ class VisualizationMatrix(Matrix):
     def reset_info(self):
         self.info_label.config(text="")
 
+    def wait(self, factor:float=1):
+        self.sleep_condition.acquire()
+        if self.autorun:
+            self.sleep_condition.wait(factor*self.sleep_time)
+        else:
+            self.sleep_condition.wait()
+        self.sleep_condition.release()
+
 
 class Worker(threading.Thread):
     def __init__(self, fn):
@@ -194,7 +218,6 @@ def prepare_inverse(root):
     vis_matrix = VisualizationMatrix(root, augmented)
     for i in range(vis_matrix.row_count()):
         vis_matrix.element_labels[i][vis_matrix.row_count()].grid(padx=(50,0))
-    vis_matrix.sleep_time=0
     return Worker(lambda: print(get_inverse_from_augmented_matrix(vis_matrix)))
 
 
