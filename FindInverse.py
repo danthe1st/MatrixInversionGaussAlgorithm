@@ -73,6 +73,9 @@ def find_augmented_matrix(matrix: SimpleMatrix) -> SimpleMatrix:
 
 
 def get_inverse_from_augmented_matrix(augmented_matrix: Matrix):
+    """
+    Compute the inverse of matrix by computing the RREF of an augmented matrix M | I.
+    """
     if augmented_matrix is None:
         return None
     dim = augmented_matrix.row_count()
@@ -88,9 +91,11 @@ def get_inverse_from_augmented_matrix(augmented_matrix: Matrix):
 
 def get_inverse(matrix: SimpleMatrix) -> SimpleMatrix:
     """
+    Firstly check whether the matrix is square, and then check that it
+    is non-singular.
+    A matrix is non-singular if and only if its determinant is non-zero.
     Afterwards, if the matrix is non-singular, compute the inverse of matrix by
     computing the ref of an augmented matrix M | I.
-    Find the inverse of the matrix by computing the RREF of the augmented matrix
     """
     augmented_matrix = find_augmented_matrix(matrix)
     return get_inverse_from_augmented_matrix(augmented_matrix)
