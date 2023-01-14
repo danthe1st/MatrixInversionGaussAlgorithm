@@ -1,6 +1,6 @@
 # Matrix Inversion/Gauss algorithm
 
-This repository contains an implementation of Row-Echelon form and Matrix inversion using the Gauss algorithm and corresponding visualizations.
+This repository contains an implementation of Row-Echelon form, Reduced Row-Echelon form and Matrix inversion using the Gauss algorithm and corresponding visualizations.
 
 The file `Matrix.py` contains a base class for matrices allowing row operations named `Matrix` and a class `SimpleMatrix` which implements these operations based on arrays.
 
