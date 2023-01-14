@@ -8,14 +8,14 @@ The file `Matrix.py` contains a base class for matrices allowing row operations 
 The file `RowEchelon.py` is responsible for converting a `Matrix` to Row-Echelon form using a function `to_row_echelon_form()` using row transformations.
 
 A matrix is in Row-Echelon form if
-- The first element of the first row is `1`.
-- All other rows start with zeros followed by a "leading" `1` followed by arbitrary numbers.
-- The leading `1` of any row is to the right of the leading `1` of the previous row.
+- The leading coefficient of each non-zero row is strictly to the right of the leading coefficients of previous row.
+- All zero-only rows are at the bottom of the matrix
 
 If a parameter `reduced` is set to `True`, the Matrix is instead converted to Reduced Row-Echelon form.
 
 A matrix is in Reduced Row-Echelon form if
 - It is in Row-Echelon form.
+- All leading coefficients are `1`.
 - In every column that contains a leading `1`, all other numbers are `0`.
 
 ## Inversion

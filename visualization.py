@@ -220,7 +220,7 @@ def prepare_inverse(root):
 
 
 def prepare_row_echelon(root):
-    original = SimpleMatrix(4, 5)
+    original = SimpleMatrix(len(config.ref_matrix), len(config.ref_matrix[0]))
     matrix = VisualizationMatrix(root, original)
     original.fill(config.ref_matrix)
     from RowEchelon import to_row_echelon_form
