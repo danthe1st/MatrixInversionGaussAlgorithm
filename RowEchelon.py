@@ -1,6 +1,5 @@
 from Matrix import SimpleMatrix
 
-
 def to_row_echelon_form(matrix: SimpleMatrix, reduced=False):
     # check if there even is a matrix
     if matrix is None:
@@ -38,7 +37,7 @@ def to_row_echelon_form(matrix: SimpleMatrix, reduced=False):
         elem = matrix.get_element(row_index, column_index)
 
         # divide each element of the current row by the elem
-        matrix.multiply_row(row_index, 1/float(elem))
+        matrix.multiply_row(row_index, elem**-1)
 
         # do this for all rows but the current one
         for i_row in range(row_count):

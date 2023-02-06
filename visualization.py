@@ -2,6 +2,8 @@ from Matrix import Matrix, SimpleMatrix
 import visualization_config as config
 from tkinter import Tk, ttk
 import threading
+import numbers
+
 
 
 class VisualizationMatrix(Matrix):
@@ -202,14 +204,64 @@ class Worker(threading.Thread):
     def run(self):
         self.fn()
 
+class Fraction:
+    def __init__(self, numerator: numbers.Number, denominator: numbers.Number):
+        if isinstance(numerator, Fraction):
+            denominator=denominator*numerator.denominator
+            numerator=numerator.numerator
+        if isinstance(denominator, Fraction):
+            numerator=numerator*denominator.denominator
+            denominator=denominator.numerator
+        i=2
+        while i<=min(numerator, denominator):
+            if numerator%i==0 and denominator%i==0:
+                numerator=numerator/i
+                denominator=denominator/i
+            else:
+                i=i+1
+        self.numerator=numerator
+        self.denominator=denominator
+
+    def __mul__(self, other):
+        if isinstance(other, Fraction):
+            return Fraction(self.numerator*other.numerator, self.denominator*other.denominator)
+        if isinstance(other, numbers.Number):
+            return Fraction(self.numerator*other, self.denominator)
+
+    def __float__(self):
+        return float(self.numerator)/float(self.denominator)
+
+    def __neg__(self):
+        return Fraction(-self.numerator,self.denominator)
+
+    def __pow__(self, val):
+        if val != -1:
+            raise NotImplementedError()
+        return Fraction(self.denominator, self.numerator)
+
+    def __eq__(self, other):
+        if isinstance(other, numbers.Number):
+            return float(self)==float(other)
+
+    def __add__(self, other):
+        if isinstance(other, Fraction):
+            return Fraction(self.numerator*other.denominator+other.numerator*self.denominator, self.denominator*other.denominator)
+        raise NotImplementedError()
+
+    def __repr__(self):
+        return f"{self.numerator}/{self.denominator}"
+
 
 def prepare_inverse(root):
     # matrix = SimpleMatrix(4, 4)
     # matrix.fill([[1, 1, 1, -1], [1, 1, -1, 1], [1, -1, 1, 1], [-1, 1, 1, 1]])
     matrix = SimpleMatrix(4, 4)
-    matrix.fill(config.inverse_matrix)
+    matrix.fill(convert_arr_to_fractions(config.inverse_matrix))
     from FindInverse import find_augmented_matrix, get_inverse_from_augmented_matrix
     augmented = find_augmented_matrix(matrix)
+    augmented_data=convert_arr_to_fractions(augmented.data)
+    augmented=SimpleMatrix(augmented.row_count(), augmented.column_count())
+    augmented.fill(augmented_data)
     if augmented is None:
         ttk.Label(root, text="Matrix is not invertible").grid(row=0, column=0)
         return Worker(lambda: None)
@@ -222,10 +274,18 @@ def prepare_inverse(root):
 def prepare_row_echelon(root):
     original = SimpleMatrix(len(config.ref_matrix), len(config.ref_matrix[0]))
     matrix = VisualizationMatrix(root, original)
-    original.fill(config.ref_matrix)
+    original.fill(convert_arr_to_fractions(config.ref_matrix))
     from RowEchelon import to_row_echelon_form
     return Worker(lambda: to_row_echelon_form(matrix, config.operation==config.VisualizationType.RREF))
 
+def convert_arr_to_fractions(arr: list[list[float]]):
+    ret=[]
+    for row in arr:
+        sublist=[]
+        for elem in row:
+            sublist.append(Fraction(elem, 1))
+        ret.append(sublist)
+    return ret
 
 def visualization_main():
     root = Tk()

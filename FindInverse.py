@@ -26,7 +26,7 @@ def get_determinant(matrix: SimpleMatrix) -> float:
     det = 0  # the determinant of the matrix
     for j in range(dim):
         minor = get_determinant(get_submatrix_r_c(matrix, 0, j))
-        det += ((-1) ** (0 + j)) * matrix.get_element(0, j) * minor
+        det += float(matrix.get_element(0, j) * ((-1) ** (0 + j)) * minor)
     return det
 
 
