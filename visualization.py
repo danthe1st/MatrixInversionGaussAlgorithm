@@ -227,6 +227,7 @@ class Fraction:
             return Fraction(self.numerator*other.numerator, self.denominator*other.denominator)
         if isinstance(other, numbers.Number):
             return Fraction(self.numerator*other, self.denominator)
+        return NotImplemented
 
     def __float__(self):
         if self.numerator==0:
@@ -242,8 +243,7 @@ class Fraction:
         return Fraction(self.denominator, self.numerator)
 
     def __eq__(self, other):
-        if isinstance(other, numbers.Number):
-            return float(self)==float(other)
+        return float(self)==float(other)
 
     def __add__(self, other):
         if isinstance(other, Fraction):
