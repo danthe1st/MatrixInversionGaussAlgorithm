@@ -213,7 +213,7 @@ class Fraction:
             numerator=numerator*denominator.denominator
             denominator=denominator.numerator
         i=2
-        while i<=min(numerator, denominator):
+        while i<=min(abs(numerator), (denominator)):
             if numerator%i==0 and denominator%i==0:
                 numerator=numerator/i
                 denominator=denominator/i
@@ -229,6 +229,8 @@ class Fraction:
             return Fraction(self.numerator*other, self.denominator)
 
     def __float__(self):
+        if self.numerator==0:
+            return 0.0
         return float(self.numerator)/float(self.denominator)
 
     def __neg__(self):
@@ -236,7 +238,7 @@ class Fraction:
 
     def __pow__(self, val):
         if val != -1:
-            raise NotImplementedError()
+            return NotImplemented
         return Fraction(self.denominator, self.numerator)
 
     def __eq__(self, other):
@@ -246,7 +248,7 @@ class Fraction:
     def __add__(self, other):
         if isinstance(other, Fraction):
             return Fraction(self.numerator*other.denominator+other.numerator*self.denominator, self.denominator*other.denominator)
-        raise NotImplementedError()
+        return NotImplemented
 
     def __repr__(self):
         return f"{self.numerator}/{self.denominator}"
@@ -278,7 +280,7 @@ def prepare_row_echelon(root):
     from RowEchelon import to_row_echelon_form
     return Worker(lambda: to_row_echelon_form(matrix, config.operation==config.VisualizationType.RREF))
 
-def convert_arr_to_fractions(arr: list[list[float]]):
+def convert_arr_to_fractions(arr: list[list[numbers.Number]]):
     ret=[]
     for row in arr:
         sublist=[]

@@ -105,7 +105,7 @@ class Matrix:
         ret=""
         for row in range(self.row_count()):
             for col in range(self.column_count()):
-                ret += f"{float(self.get_element(row, col)):20}"
+                ret += f"{self.get_element(row, col)}"
                 ret += " "
             ret += "\n"
         return ret
