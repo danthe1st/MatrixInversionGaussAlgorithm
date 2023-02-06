@@ -213,7 +213,7 @@ class Fraction:
             numerator=numerator*denominator.denominator
             denominator=denominator.numerator
         i=2
-        while i<=min(abs(numerator), (denominator)):
+        while i<=min(abs(numerator), abs(denominator)):
             if numerator%i==0 and denominator%i==0:
                 numerator=numerator/i
                 denominator=denominator/i
